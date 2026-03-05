@@ -12,8 +12,9 @@ const light = new THREE.PointLight(0x00aaff, 2, 100);
 light.position.set(10,10,10);
 scene.add(light);
 
-// Store blocks
+// Store blocks and models
 let blocks = [];
+let uploadedModel = null;
 
 // Function to create block
 function createBlock(x, y, z) {
@@ -26,18 +27,47 @@ function createBlock(x, y, z) {
   blocks.push(block);
 }
 
-// Explode model (demo: explode all blocks)
-function explodeBlocks() {
-  blocks.forEach(block => {
-    gsap.to(block.position, {
-      x: block.position.x + (Math.random()-0.5)*5,
-      y: block.position.y + (Math.random()-0.5)*5,
-      z: block.position.z + (Math.random()-0.5)*5,
-      duration: 1.5,
-      ease: "power2.out"
+// Explode blocks or model
+function explodeScene() {
+  if (uploadedModel) {
+    uploadedModel.traverse(child => {
+      if (child.isMesh) {
+        gsap.to(child.position, {
+          x: child.position.x + (Math.random()-0.5)*5,
+          y: child.position.y + (Math.random()-0.5)*5,
+          z: child.position.z + (Math.random()-0.5)*5,
+          duration: 1.5,
+          ease: "power2.out"
+        });
+      }
     });
-  });
+  } else {
+    blocks.forEach(block => {
+      gsap.to(block.position, {
+        x: block.position.x + (Math.random()-0.5)*5,
+        y: block.position.y + (Math.random()-0.5)*5,
+        z: block.position.z + (Math.random()-0.5)*5,
+        duration: 1.5,
+        ease: "power2.out"
+      });
+    });
+  }
 }
+
+// Upload model button
+document.getElementById('uploadModel').addEventListener('change', event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  const loader = new THREE.GLTFLoader();
+  loader.load(url, gltf => {
+    if (uploadedModel) scene.remove(uploadedModel);
+    uploadedModel = gltf.scene;
+    uploadedModel.scale.set(1,1,1);
+    scene.add(uploadedModel);
+  });
+});
 
 // MediaPipe Hands setup
 const videoElement = document.getElementById('camera');
@@ -54,7 +84,12 @@ hands.setOptions({
 });
 
 hands.onResults(results => {
+  canvasCtx.save();
   canvasCtx.clearRect(0,0,canvasElement.width,canvasElement.height);
+
+  // Draw camera feed
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
   if (results.multiHandLandmarks) {
     results.multiHandLandmarks.forEach(landmarks => {
       // Pinch detection: thumb tip (4) and index tip (8)
@@ -63,7 +98,6 @@ hands.onResults(results => {
       const dist = Math.hypot(thumb.x - index.x, thumb.y - index.y);
 
       if (dist < 0.05) {
-        // Map to scene coords
         const x = (index.x - 0.5) * 10;
         const y = -(index.y - 0.5) * 10;
         createBlock(x,y,0);
@@ -75,11 +109,12 @@ hands.onResults(results => {
         const hand2 = results.multiHandLandmarks[1][0];
         const apart = Math.abs(hand1.x - hand2.x);
         if (apart > 0.5) {
-          explodeBlocks();
+          explodeScene();
         }
       }
     });
   }
+  canvasCtx.restore();
 });
 
 // Camera setup
