@@ -6,11 +6,18 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Camera feed -->
   <video id="camera" autoplay playsinline></video>
-  <canvas id="output"></canvas>
+  <canvas id="output" width="640" height="480"></canvas>
+
+  <!-- Upload model button -->
+  <input type="file" id="uploadModel" accept=".gltf,.glb" />
+
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="script.js"></script>
 </body>
