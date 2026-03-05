@@ -11,7 +11,7 @@ video {
   left: 0;
   width: 640px;
   height: 480px;
-  opacity: 0.3; /* overlay effect */
+  opacity: 0.4; /* overlay effect */
   z-index: 0;
 }
 
