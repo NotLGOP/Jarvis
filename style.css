@@ -6,11 +6,30 @@ body {
 }
 
 video {
-  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 640px;
+  height: 480px;
+  opacity: 0.3; /* overlay effect */
+  z-index: 0;
 }
 
 canvas {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
+}
+
+#uploadModel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(0, 50, 100, 0.8);
+  color: #00aaff;
+  border: 1px solid #00aaff;
+  padding: 8px;
+  font-family: 'Orbitron', sans-serif;
 }
